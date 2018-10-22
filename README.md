@@ -1,4 +1,4 @@
-Second and last version of the self balancing robot based on the ESP 8266 
+Version of the self balancing robot based on the ESP 8266 
 
 
 This version is much faster because uses the asynch web server and web socket for remote controls
@@ -7,7 +7,7 @@ This version is much faster because uses the asynch web server and web socket fo
 You just need to upload the sketch into your ESP8266 and then accessing to it, the ssid is ESP8266SBR and the password is Algorithm, then digit 192.168.4.1 as ip, and then you'll be free to set all parameters for use your self balancing robot.
 
 
-It also manage a sr04 sensor wich will help you to not hit object around you while remote control
+It also manage a sr04 sensor wich will help you to not hit object around you while remote controllling it.
 
 This version has OTA handler wich be managed during the stand-by, during that you can access to the website of the robot or upload the firmware remotely without cable.
 
