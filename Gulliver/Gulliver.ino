@@ -30,7 +30,7 @@ MPU9250 mpu;
 
 bool sensorDataSync = false;
 volatile bool OTAstate = false;
-volatile bool remote = true;
+volatile bool remote = false;
 volatile bool distanceDataReady = false;
 bool robotDirection = false;
 bool servoDirection = false;
@@ -571,13 +571,13 @@ void speedManager() {
 //==============================================================
 
 void otaManager() {
-  if (!remote || (digitalRead(OTAbutton) == LOW && !OTAstate)) {
+  if ((!remote && !OTAstate)|| (digitalRead(OTAbutton) == LOW && !OTAstate)) {
     stopMotors();
     digitalWrite(led, HIGH);
     OTAstate = true;
     delay(500);
   }
-  if (remote || (digitalRead(OTAbutton) == LOW && OTAstate)) {
+  if ((remote && OTAstate) || (digitalRead(OTAbutton) == LOW && OTAstate)) {
     digitalWrite(led, LOW);
     OTAstate = false;
     delay(500);
