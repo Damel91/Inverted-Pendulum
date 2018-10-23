@@ -423,9 +423,9 @@ void setup() {
     server.on("/toggleOTA", HTTP_GET, [](AsyncWebServerRequest * request) {
       String OTA = request->getParam("testo")->value();
       if (OTA.equals("true")) {
-        remote = true;
-      } else {
         remote = false;
+      } else {
+        remote = true;
       }
 
     });
@@ -571,17 +571,19 @@ void speedManager() {
 //==============================================================
 
 void otaManager() {
-  if ((!remote || digitalRead(OTAbutton) == LOW) && !OTAstate) {
-    if (digitalRead(OTAbutton) == LOW && remote) {
+  bool temp = digitalRead(OTAbutton) == LOW;
+  if (!OTAstate && (!remote || temp)) {
+    if (temp) {
       remote = false;
+      temp = false;
     }
     stopMotors();
     digitalWrite(led, HIGH);
     OTAstate = true;
     delay(500);
   }
-  if ((remote || digitalRead(OTAbutton) == LOW) && OTAstate) {
-    if (digitalRead(OTAbutton) == LOW && !remote) {
+  if (OTAstate && (remote || temp)) {
+    if (temp) {
       remote = true;
     }
     digitalWrite(led, LOW);
