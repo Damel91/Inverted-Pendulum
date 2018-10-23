@@ -12,9 +12,9 @@ It also manage a sr04 sensor wich will help you to not hit object around you whi
 This version has OTA handler wich be managed during the stand-by, during that you can access to the website of the robot or upload the firmware remotely without cable.
 
 
-The stl files can be found here in case you want to print my design https://www.thingiverse.com/thing:3084400
+The stl files can be found here in case you want to print my design https://www.thingiverse.com/thing:3084400 or if you click on Inverted-Pendulum and you can download the entire project which also contain the stl files.
 
 
-Very soon I'll update this branch by putting the schematic and a video showing how it works
+Very soon I'll update this branch by putting the schematic and a video showing how it works.
 
 
