@@ -571,13 +571,19 @@ void speedManager() {
 //==============================================================
 
 void otaManager() {
-  if ((!remote && !OTAstate)|| (digitalRead(OTAbutton) == LOW && !OTAstate)) {
+  if ((!remote || digitalRead(OTAbutton) == LOW) && !OTAstate) {
+    if (digitalRead(OTAbutton) == LOW && remote) {
+      remote = false;
+    }
     stopMotors();
     digitalWrite(led, HIGH);
     OTAstate = true;
     delay(500);
   }
-  if ((remote && OTAstate) || (digitalRead(OTAbutton) == LOW && OTAstate)) {
+  if ((remote || digitalRead(OTAbutton) == LOW) && OTAstate) {
+    if (digitalRead(OTAbutton) == LOW && !remote) {
+      remote = true;
+    }
     digitalWrite(led, LOW);
     OTAstate = false;
     delay(500);
@@ -792,7 +798,7 @@ void servoMove() {
 }
 
 //==============================================================
-//This function activate the SR04 every 60ms like in the datasheet, and changes the global distance variable, also it moves the servo if needed 
+//This function activate the SR04 every 60ms like in the datasheet, and changes the global distance variable, also it moves the servo if needed
 //==============================================================
 
 void measure() {
@@ -857,8 +863,8 @@ void measureDAngle() {
 }
 
 //==============================================================
-//This function changes the pitch global variable, here the adjust angle and speed variable are added ripectively as offset and for kicking the robot, because it doesn't have any meaning of the speed 
-//You can use the mpu6050 or 9250 using only four pin without connecting the INT pin to the microcontroller 
+//This function changes the pitch global variable, here the adjust angle and speed variable are added ripectively as offset and for kicking the robot, because it doesn't have any meaning of the speed
+//You can use the mpu6050 or 9250 using only four pin without connecting the INT pin to the microcontroller
 //==============================================================
 
 // I2C device class (I2Cdev) demonstration Arduino sketch for MPU6050 class using DMP (MotionApps v2.0)
@@ -881,24 +887,24 @@ void measureDAngle() {
 //      2012-05-30 - basic DMP initialization working
 
 /* ============================================
-I2Cdev device library code is placed under the MIT license
-Copyright (c) 2012 Jeff Rowberg
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-===============================================
+  I2Cdev device library code is placed under the MIT license
+  Copyright (c) 2012 Jeff Rowberg
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  THE SOFTWARE.
+  ===============================================
 */
 
 void dmpData() {

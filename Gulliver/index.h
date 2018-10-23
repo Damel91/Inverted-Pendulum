@@ -279,7 +279,7 @@ body {
    <td></td>
    <td></td>
     <td></td>
-    <td><button class="buttonh" type="button" onclick="RControl(3)">&#8593;&#8593;&#8593;</button></td>
+    <td><button class="buttonh" type="button" onclick="RControl("3")">&#8593;&#8593;&#8593;</button></td>
    <td></td>
    <td></td>
     <td></td>
@@ -288,7 +288,7 @@ body {
    <td></td>
    <td></td>
     <td></td>
-    <td><button class="buttonm" type="button" onclick="RControl(2)">&#8593;&#8593;</button></td>
+    <td><button class="buttonm" type="button" onclick="RControl("2")">&#8593;&#8593;</button></td>
    <td></td>
    <td></td>
     <td></td>
@@ -297,34 +297,25 @@ body {
    <td></td>
    <td></td>
     <td></td>
-    <td><button class="button" type="button" onclick="RControl(1)"> &#8593; </button></td>
+    <td><button class="button" type="button" onclick="RControl("1")"> &#8593; </button></td>
     <td></td>
   <td></td>
   <td></td>
   </tr>
   <tr>
-      <td><button class="buttonth" type="button" onclick="RControl(t)">&#8592;&#8592;&#8592;</button></td>
-      <td><button class="buttontm" type="button" onclick="RControl(r)">&#8592;&#8592;</button></td>
-    <td><button class="buttont" type="button" onclick="RControl(4)">&#8592;</button></td>
+      <td><button class="buttonth" type="button" onclick="RControl("t")">&#8592;&#8592;&#8592;</button></td>
+      <td><button class="buttontm" type="button" onclick="RControl("r")">&#8592;&#8592;</button></td>
+    <td><button class="buttont" type="button" onclick="RControl("4")">&#8592;</button></td>
     <td></td>
-    <td><button class="buttont"  type="button" onclick="RControl(5)">&#8594;</button></td>
-      <td><button class="buttontm" type="button" onclick="RControl(s)">&#8594;&#8594;</button></td>
-        <td><button class="buttonth" type="button" onclick="RControl(z)">&#8594;&#8594;&#8594;</button></td>
+    <td><button class="buttont"  type="button" onclick="RControl("5")">&#8594;</button></td>
+      <td><button class="buttontm" type="button" onclick="RControl("s")">&#8594;&#8594;</button></td>
+        <td><button class="buttonth" type="button" onclick="RControl("z")">&#8594;&#8594;&#8594;</button></td>
   </tr>
     <tr>
    <td></td>
    <td></td>
     <td></td>
-    <td><button class="button" type="button" onclick="RControl(6)"> &#8595; </button></td>
-   <td></td>
-   <td></td>
-    <td></td>
-  </tr>
-    <tr>
-   <td></td>
-   <td></td>
-    <td></td>
-    <td><button class="buttonm" type="button" onclick="RControl(7)">&#8595;&#8595; </button></td>
+    <td><button class="button" type="button" onclick="RControl("6")"> &#8595; </button></td>
    <td></td>
    <td></td>
     <td></td>
@@ -333,7 +324,16 @@ body {
    <td></td>
    <td></td>
     <td></td>
-    <td><button class="buttonh"  type="button" onclick="RControl(8)">&#8595;&#8595;&#8595;</button></td>
+    <td><button class="buttonm" type="button" onclick="RControl("7")">&#8595;&#8595; </button></td>
+   <td></td>
+   <td></td>
+    <td></td>
+  </tr>
+    <tr>
+   <td></td>
+   <td></td>
+    <td></td>
+    <td><button class="buttonh"  type="button" onclick="RControl("8")">&#8595;&#8595;&#8595;</button></td>
    <td></td>
    <td></td>
     <td></td>
@@ -343,7 +343,6 @@ body {
 <script>
 var connection = new WebSocket('ws://192.168.4.1/ws');
 connection.onopen = function () {
-  console.log('Connected ', successfull);
 };
 connection.onerror = function (error) {
   console.log('WebSocket Error ', error);
@@ -356,7 +355,7 @@ connection.onclose = function () {
 };
 
 function RControl(number) {
-  connection.send(number.toString());
+  connection.send(number);
 }
 </script>
    </div>
