@@ -1,6 +1,5 @@
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
-
 #include <EEPROM.h>
 #include <PID_v1.h>
 #include <Servo.h>
@@ -44,7 +43,6 @@ double value = 0.00;
 double output = 0.00;
 double speedRobot = 0.00;
 int i = 0;
-int d = 0;
 int servoTrigger = 0;
 int positionR = 0;
 int wheelDir, servoPos = 0;
@@ -95,7 +93,7 @@ VectorFloat gravity;    // [x, y, z]            gravity vector
 
 
 //==============================================================
-//                  SETUP
+//                  WEB SOCKET EVENT AND NOT FOUND ROUTINE
 //==============================================================
 
 
@@ -183,6 +181,11 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
 void notFound(AsyncWebServerRequest *request) {
   request->send(404, "text/plain", "Not found");
 }
+
+
+//==============================================================
+//                  SETUP
+//==============================================================
 
 
 void setup() {
@@ -502,6 +505,13 @@ void loop() {
   }
 }
 ////////////////////////////////////////////////////////////////////
+
+
+//==============================================================
+//  sr04 ISR routine attached to the echo pin used as interrupt
+//==============================================================
+
+
 void readPin() { // echo pin interrupt
   if (OTAstate) {
     return;
@@ -516,10 +526,49 @@ void readPin() { // echo pin interrupt
   }
 }
 
+//==============================================================
+//                  Remote controls function manager
+//==============================================================
+
 void RCmanager() {
   checkTurn();
   speedManager();
 }
+
+void checkTurn() {
+  if (desiredAngle != 0.00) {
+    if (!turnStarted) {
+      turnStarted = true;
+      turnTimer = millis();
+    } else if (millis() - turnTimer >= turnTime) {
+      desiredAngle = 0.00;
+      turnStarted = false;
+    }
+  }
+}
+
+void speedManager() {
+  if (speedRobot != 0.00) {
+    if (speedRobot >= 0.00) {
+      robotDirection = false;
+    } else {
+      robotDirection = true;
+    }
+    if (!started) {
+      speedTimer = millis();
+      started = true;
+    } else {
+      if (millis() - speedTimer >= speedTime) {
+        speedRobot = 0.00;
+        started = false;
+      }
+    }
+  }
+}
+
+//==============================================================
+//OTA, you can enter in this modality remotely or by pressing the button the robot start in this state
+//==============================================================
 
 void otaManager() {
   if (!remote || (digitalRead(OTAbutton) == LOW && !OTAstate)) {
@@ -534,6 +583,10 @@ void otaManager() {
     delay(500);
   }
 }
+
+//==============================================================
+//This function calculate the output from the DMP pitch and send it to the motor controller routine
+//==============================================================
 
 void calculatePID() {
   if (sensorDataSync) {
@@ -574,6 +627,10 @@ void calculatePID() {
     }
   }
 }
+
+//==============================================================
+//This function check for minumum motor voltage, max motor voltage and turn routine
+//==============================================================
 
 void motorController() {
   if (value < motorMinVoltage && value != 0.00) {
@@ -657,6 +714,10 @@ void motorController() {
   }
 }
 
+//==============================================================
+//This function check that the analog write doesn't get over the maximum motor voltage
+//==============================================================
+
 void checkMotorMaxVoltage() {
   if (val > motorMaxVoltage) {
     val = motorMaxVoltage;
@@ -665,6 +726,10 @@ void checkMotorMaxVoltage() {
     val2 = motorMaxVoltage;
   }
 }
+
+//==============================================================
+//                  basic analog write funtions
+//==============================================================
 
 void goBackwardM12() {
   analogWrite(m1, 1);
@@ -703,6 +768,10 @@ void stopMotors() {
   analogWrite(m4, 1);
 }
 
+//==============================================================
+//Servo routine, it moves every 3 x times the measure routine run
+//==============================================================
+
 void servoMove() {
   if (servoTrigger == 3) {
     servoTrigger = 0;
@@ -714,15 +783,17 @@ void servoMove() {
       servoDirection = false;
     }
     if (servoDirection) {
-      d++;
       servoPos = servoPos + 45;
     } else {
-      d--;
       servoPos = servoPos - 45;
     }
     myservo.write(servoPos);
   }
 }
+
+//==============================================================
+//This function activate the SR04 every 60ms like in the datasheet, and changes the global distance variable, also it moves the servo if needed 
+//==============================================================
 
 void measure() {
   unsigned long now = millis();
@@ -743,10 +814,15 @@ void measure() {
   }
 }
 
+//==============================================================
+//This function let the robot turn by measuring the actual distance and in 90 degree case, let the robot go backward
+//==============================================================
+
 void obstacleAvoidance() {
   if (distance < 15.00) {
     if (servoPos == 90) {
       speedRobot = -2.00;
+      speedTime = 250;
     } else {
       speedRobot = -2.00;
       if (servoPos < 90)
@@ -759,24 +835,9 @@ void obstacleAvoidance() {
   }
 }
 
-void speedManager() {
-  if (speedRobot != 0.00) {
-    if (speedRobot >= 0.00) {
-      robotDirection = false;
-    } else {
-      robotDirection = true;
-    }
-    if (!started) {
-      speedTimer = millis();
-      started = true;
-    } else {
-      if (millis() - speedTimer >= speedTime) {
-        speedRobot = 0.00;
-        started = false;
-      }
-    }
-  }
-}
+//==============================================================
+//This is my backup function that I created for give more stability to the robot
+//==============================================================
 
 void measureDAngle() {
 
@@ -795,17 +856,50 @@ void measureDAngle() {
   }
 }
 
-void checkTurn() {
-  if (desiredAngle != 0.00) {
-    if (!turnStarted) {
-      turnStarted = true;
-      turnTimer = millis();
-    } else if (millis() - turnTimer >= turnTime) {
-      desiredAngle = 0.00;
-      turnStarted = false;
-    }
-  }
-}
+//==============================================================
+//This function changes the pitch global variable, here the adjust angle and speed variable are added ripectively as offset and for kicking the robot, because it doesn't have any meaning of the speed 
+//You can use the mpu6050 or 9250 using only four pin without connecting the INT pin to the microcontroller 
+//==============================================================
+
+// I2C device class (I2Cdev) demonstration Arduino sketch for MPU6050 class using DMP (MotionApps v2.0)
+// 6/21/2012 by Jeff Rowberg <jeff@rowberg.net>
+// Updates should (hopefully) always be available at https://github.com/jrowberg/i2cdevlib
+//
+// Changelog:
+//      2013-05-08 - added seamless Fastwire support
+//                 - added note about gyro calibration
+//      2012-06-21 - added note about Arduino 1.0.1 + Leonardo compatibility error
+//      2012-06-20 - improved FIFO overflow handling and simplified read process
+//      2012-06-19 - completely rearranged DMP initialization code and simplification
+//      2012-06-13 - pull gyro and accel data from FIFO packet instead of reading directly
+//      2012-06-09 - fix broken FIFO read sequence and change interrupt detection to RISING
+//      2012-06-05 - add gravity-compensated initial reference frame acceleration output
+//                 - add 3D math helper file to DMP6 example sketch
+//                 - add Euler output and Yaw/Pitch/Roll output formats
+//      2012-06-04 - remove accel offset clearing for better results (thanks Sungon Lee)
+//      2012-06-01 - fixed gyro sensitivity to be 2000 deg/sec instead of 250
+//      2012-05-30 - basic DMP initialization working
+
+/* ============================================
+I2Cdev device library code is placed under the MIT license
+Copyright (c) 2012 Jeff Rowberg
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+===============================================
+*/
 
 void dmpData() {
   unsigned long now = millis();
