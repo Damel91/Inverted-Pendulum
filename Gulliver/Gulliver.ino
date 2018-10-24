@@ -598,41 +598,41 @@ void otaManager() {
 
 void calculatePID() {
   //if (sensorDataSync) {
-   // sensorDataSync = false;
-    k = fabs(pitch);
+  // sensorDataSync = false;
+  k = fabs(pitch);
 
-    if (k <= 60.00) {
-      measureDAngle();
-      if (k <= zeroAngle) {
-        Input = 0.00;
-      } else {
-        Input = pitch;
-      }
-
-      if (Kp != pTemp || Ki != iTemp || Kd != dTemp) {
-        myPID.SetTunings(Kp, Ki, Kd);
-        pTemp = Kp;
-        iTemp = Ki;
-        dTemp = Kd;
-      }
-
-      myPID.Compute();
-      if (output != Output) {
-        output = Output;
-        value = fabs(Output);
-        motorController();
-      }
-
-      if (stopRobot) {
-        stopRobot = false;
-      }
-
+  if (k <= 60.00) {
+    measureDAngle();
+    if (k <= zeroAngle) {
+      Input = 0.00;
     } else {
-      if (!stopRobot) {
-        stopMotors();
-        stopRobot = true;
-      }
+      Input = pitch;
     }
+
+    if (Kp != pTemp || Ki != iTemp || Kd != dTemp) {
+      myPID.SetTunings(Kp, Ki, Kd);
+      pTemp = Kp;
+      iTemp = Ki;
+      dTemp = Kd;
+    }
+
+    myPID.Compute();
+    if (output != Output) {
+      output = Output;
+      value = fabs(Output);
+      motorController();
+    }
+
+    if (stopRobot) {
+      stopRobot = false;
+    }
+
+  } else {
+    if (!stopRobot) {
+      stopMotors();
+      stopRobot = true;
+    }
+  }
   //}
 }
 
@@ -912,38 +912,56 @@ void measureDAngle() {
 void dmpData() {
   //unsigned long now = millis();
   //if (now - dmpTimer >= sampleTime) {
-    //dmpTimer = now;
-    //sensorDataSync = true;
-    mpuIntStatus = mpu.getIntStatus();
-    if (mpuIntStatus & 0x02 || fifoCount >= packetSize) {
-      // reset interrupt flag and get INT_STATUS byte
-      //dmpReady = false;
-      // get current FIFO count
-      fifoCount = mpu.getFIFOCount();
-      // check for overflow (this should never happen unless our code is too inefficient)
-      if ((mpuIntStatus & 0x10) || fifoCount == 1024) {
-        // reset so we can continue cleanly
-        mpu.resetFIFO();
-        // Serial.println(F("FIFO overflow!"));
+  //dmpTimer = now;
+  //sensorDataSync = true;
+  mpuIntStatus = mpu.getIntStatus();
+  if (mpuIntStatus & 0x02 || fifoCount >= packetSize) {
+    // reset interrupt flag and get INT_STATUS byte
+    //dmpReady = false;
+    // get current FIFO count
+    fifoCount = mpu.getFIFOCount();
+    // check for overflow (this should never happen unless our code is too inefficient)
+    if ((mpuIntStatus & 0x10) || fifoCount == 1024) {
+      // reset so we can continue cleanly
+      mpu.resetFIFO();
+      // Serial.println(F("FIFO overflow!"));
 
-        // otherwise, check for DMP data ready interrupt (this should happen frequently)
-      } else if (mpuIntStatus & 0x02) {
-        // wait for correct available data length, should be a VERY short wait
-        while (fifoCount < packetSize) fifoCount = mpu.getFIFOCount();
+      // otherwise, check for DMP data ready interrupt (this should happen frequently)
+    } else if (mpuIntStatus & 0x02) {
+      // wait for correct available data length, should be a VERY short wait
+      while (fifoCount < packetSize) fifoCount = mpu.getFIFOCount();
 
-        // read a packet from FIFO
-        mpu.getFIFOBytes(fifoBuffer, packetSize);
+      // read a packet from FIFO
+      mpu.getFIFOBytes(fifoBuffer, packetSize);
 
-        // track FIFO count here in case there is > 1 packet available
-        // (this lets us immediately read more without waiting for an interrupt)
-        fifoCount -= packetSize;
-        float ypr[3];
-        mpu.dmpGetQuaternion(&q, fifoBuffer);
-        mpu.dmpGetGravity(&gravity, &q);
-        mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
-        ypr[1] = ypr[1] * 180 / M_PI;
-        pitch = adjustAngle + ypr[1] + speedRobot;
+      // track FIFO count here in case there is > 1 packet available
+      // (this lets us immediately read more without waiting for an interrupt)
+      fifoCount -= packetSize;
+      float ypr[3];
+      mpu.dmpGetQuaternion(&q, fifoBuffer);
+      mpu.dmpGetGravity(&gravity, &q);
+      mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
+      ypr[1] = ypr[1] * 180 / M_PI;
+      pitch = adjustAngle + ypr[1] + speedRobot;
+      //speed = a * t
+      dmpTimer = millis() - dmpTimer;
+      double time = dmpTimer / 1000;
+      precAcc = acc;
+      double speed = time * acc;
+      if (acc < 0.00) {
+        if (acc > precAcc) {
+          totalSpeed = totalSpeed + fabs(speed);
+        } else {
+          totalSpeed = speed + totalSpeed;
+        }
+      } else {
+        if (acc < precAcc) {
+          totalSpeed = totalSpeed - speed;
+        } else {
+          totalSpeed = speed + totalSpeed;
+        }
       }
+    }
     //}
   }
 }
