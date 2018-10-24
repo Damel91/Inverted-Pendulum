@@ -943,24 +943,6 @@ void dmpData() {
       mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
       ypr[1] = ypr[1] * 180 / M_PI;
       pitch = adjustAngle + ypr[1] + speedRobot;
-      //speed = a * t
-      dmpTimer = millis() - dmpTimer;
-      double time = dmpTimer / 1000;
-      precAcc = acc;
-      double speed = time * acc;
-      if (acc < 0.00) {
-        if (acc > precAcc) {
-          totalSpeed = totalSpeed + fabs(speed);
-        } else {
-          totalSpeed = speed + totalSpeed;
-        }
-      } else {
-        if (acc < precAcc) {
-          totalSpeed = totalSpeed - speed;
-        } else {
-          totalSpeed = speed + totalSpeed;
-        }
-      }
     }
     //}
   }
