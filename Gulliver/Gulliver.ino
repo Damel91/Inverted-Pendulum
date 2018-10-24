@@ -28,7 +28,7 @@ AsyncWebServer server(80); //Server on port 80
 AsyncWebSocket ws("/ws");
 MPU9250 mpu;
 
-bool sensorDataSync = false;
+//bool sensorDataSync = false;
 volatile bool OTAstate = false;
 volatile bool remote = false;
 volatile bool distanceDataReady = false;
@@ -597,8 +597,8 @@ void otaManager() {
 //==============================================================
 
 void calculatePID() {
-  if (sensorDataSync) {
-    sensorDataSync = false;
+  //if (sensorDataSync) {
+   // sensorDataSync = false;
     k = fabs(pitch);
 
     if (k <= 60.00) {
@@ -633,7 +633,7 @@ void calculatePID() {
         stopRobot = true;
       }
     }
-  }
+  //}
 }
 
 //==============================================================
@@ -910,10 +910,10 @@ void measureDAngle() {
 */
 
 void dmpData() {
-  unsigned long now = millis();
-  if (now - dmpTimer >= sampleTime) {
-    dmpTimer = now;
-    sensorDataSync = true;
+  //unsigned long now = millis();
+  //if (now - dmpTimer >= sampleTime) {
+    //dmpTimer = now;
+    //sensorDataSync = true;
     mpuIntStatus = mpu.getIntStatus();
     if (mpuIntStatus & 0x02 || fifoCount >= packetSize) {
       // reset interrupt flag and get INT_STATUS byte
@@ -944,6 +944,6 @@ void dmpData() {
         ypr[1] = ypr[1] * 180 / M_PI;
         pitch = adjustAngle + ypr[1] + speedRobot;
       }
-    }
+    //}
   }
 }
