@@ -15,6 +15,3 @@ This version has OTA handler wich be managed during the stand-by, during that yo
 The stl files can be found here in case you want to print my design https://www.thingiverse.com/thing:3084400 or if you click on Inverted-Pendulum and you can download the entire project which also contain the stl files.
 
 
-Very soon I'll update this branch by putting a video showing how it works.
-
-
