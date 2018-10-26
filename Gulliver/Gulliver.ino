@@ -66,7 +66,7 @@ int OTAbutton = D2;
 int servo = RX; // or D9 for node mcu
 int led = TX;
 int turnTime = 0;
-int sampleTime = 10;
+int sampleTime = 15;
 double distance = 20.00;
 volatile unsigned long start;
 volatile unsigned long finish;
@@ -454,7 +454,7 @@ void setup() {
 
       //pid servo and sr04 configuration
       myPID.SetTunings(Kp, Ki, Kd);
-      myPID.SetSampleTime(sampleTime + 5);
+      myPID.SetSampleTime(sampleTime);
       myPID.SetOutputLimits(-1023, 1023);
       //turn the PID on
       myPID.SetMode(AUTOMATIC);
@@ -910,10 +910,6 @@ void measureDAngle() {
 */
 
 void dmpData() {
-  //unsigned long now = millis();
-  //if (now - dmpTimer >= sampleTime) {
-  //dmpTimer = now;
-  //sensorDataSync = true;
   mpuIntStatus = mpu.getIntStatus();
   if (mpuIntStatus & 0x02 || fifoCount >= packetSize) {
     // reset interrupt flag and get INT_STATUS byte
@@ -944,6 +940,5 @@ void dmpData() {
       ypr[1] = ypr[1] * 180 / M_PI;
       pitch = adjustAngle + ypr[1] + speedRobot;
     }
-    //}
   }
 }
