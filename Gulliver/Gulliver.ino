@@ -28,7 +28,6 @@ AsyncWebServer server(80); //Server on port 80
 AsyncWebSocket ws("/ws");
 MPU9250 mpu;
 
-//bool sensorDataSync = false;
 volatile bool OTAstate = false;
 volatile bool remote = false;
 volatile bool distanceDataReady = false;
@@ -131,37 +130,55 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
       desiredAngle = 5.00;
       turnTime = 80;
       speedTime = 80;
-      speedRobot = 2.00;
+      if (!robotDirection)
+        speedRobot = 2.00;
+      else
+        speedRobot = -2.00;
     }
     if (input == 'r') {
       desiredAngle = 5.00;
       turnTime = 120;
       speedTime = 120;
-      speedRobot = 2.00;
+      if (!robotDirection)
+        speedRobot = 2.00;
+      else
+        speedRobot = -2.00;
     }
     if (input == 't') {
       desiredAngle = 5.00;
       turnTime = 200;
       speedTime = 200;
-      speedRobot = 2.00;
+      if (!robotDirection)
+        speedRobot = 2.00;
+      else
+        speedRobot = -2.00;
     }
     if (input == '5') {
       desiredAngle = -5.00;
       turnTime = 80;
       speedTime = 80;
-      speedRobot = -2.00;
+      if (!robotDirection)
+        speedRobot = 2.00;
+      else
+        speedRobot = -2.00;
     }
     if (input == 's') {
       desiredAngle = -5.00;
       turnTime = 120;
       speedTime = 120;
-      speedRobot = -2.00;
+      if (!robotDirection)
+        speedRobot = 2.00;
+      else
+        speedRobot = -2.00;
     }
     if (input == 'z') {
       desiredAngle = -5.00;
       turnTime = 200;
       speedTime = 200;
-      speedRobot = -2.00;
+      if (!robotDirection)
+        speedRobot = 2.00;
+      else
+        speedRobot = -2.00;
     }
     if (input == '6') {
       speedRobot = -2.00;
@@ -832,7 +849,7 @@ void obstacleAvoidance() {
       speedRobot = -2.00;
       speedTime = 250;
     } else {
-      speedRobot = -2.00;
+      speedRobot = -0.50;
       if (servoPos < 90)
         desiredAngle = 5.00;
       if (servoPos > 90)
