@@ -89,6 +89,7 @@ uint8_t mpuIntStatus;
 // orientation/motion vars
 Quaternion q;           // [w, x, y, z]         quaternion container
 VectorFloat gravity;    // [x, y, z]            gravity vector
+VectorInt16 acc;
 
 
 //==============================================================
@@ -951,10 +952,12 @@ void dmpData() {
       // (this lets us immediately read more without waiting for an interrupt)
       fifoCount -= packetSize;
       float ypr[3];
-      mpu.dmpGetQuaternion(&q, fifoBuffer);
-      mpu.dmpGetGravity(&gravity, &q);
-      mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
-      ypr[1] = ypr[1] * 180 / M_PI;
+        mpu.dmpGetQuaternion(&q, fifoBuffer);
+        mpu.dmpGetGravity(&gravity, &q);
+        mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
+        ypr[1] = ypr[1] * 180 / M_PI;
+      //mpu.dmpGetAccel(&acc, fifoBuffer);
+      //ypr[1] = (acc.z / 91.022) + 90.00;
       pitch = adjustAngle + ypr[1] + speedRobot;
     }
   }
