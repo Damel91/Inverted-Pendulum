@@ -4,7 +4,7 @@
 #include <PID_v1.h>
 #include <Servo.h>
 #include "I2Cdev.h"
-#include "MPU9250_9Axis_MotionApps41.h"
+#include "MPU6050_6Axis_MotionApps20.h"
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ArduinoJson.h>
@@ -26,7 +26,7 @@ const char* password = "Algorithm";
 
 AsyncWebServer server(80); //Server on port 80
 AsyncWebSocket ws("/ws");
-MPU9250 mpu;
+MPU6050 mpu;
 
 volatile bool OTAstate = false;
 volatile bool remote = false;
@@ -89,7 +89,6 @@ uint8_t mpuIntStatus;
 // orientation/motion vars
 Quaternion q;           // [w, x, y, z]         quaternion container
 VectorFloat gravity;    // [x, y, z]            gravity vector
-
 
 //==============================================================
 //                  WEB SOCKET EVENT AND NOT FOUND ROUTINE
@@ -452,7 +451,6 @@ void setup() {
 
     // initialize device
     mpu.initialize();
-
     // Initializing DMP
     uint8_t devStatus;      // return status after each device operation (0 = success, !0 = error)
     devStatus = mpu.dmpInitialize();
@@ -491,7 +489,6 @@ void setup() {
       myservo.attach(servo);
       Input = 0.00;
       pinMode(led, OUTPUT);
-      digitalWrite(led, HIGH);
       server.onNotFound(notFound);
       server.begin();
     }
@@ -520,6 +517,7 @@ void loop() {
   } else {
     ArduinoOTA.handle();
   }
+  Serial.println(pitch);
 }
 ////////////////////////////////////////////////////////////////////
 
@@ -951,11 +949,14 @@ void dmpData() {
       // (this lets us immediately read more without waiting for an interrupt)
       fifoCount -= packetSize;
       float ypr[3];
+
       mpu.dmpGetQuaternion(&q, fifoBuffer);
       mpu.dmpGetGravity(&gravity, &q);
       mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
-      ypr[1] = ypr[1] * 180 / M_PI;
+
+      ypr[1] = (ypr[1] * 180 / M_PI);
       pitch = adjustAngle + ypr[1] + speedRobot;
+      //Serial.println(ypr[1]);
     }
   }
 }
