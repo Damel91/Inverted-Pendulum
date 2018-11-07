@@ -71,7 +71,6 @@ volatile unsigned long start;
 volatile unsigned long finish;
 unsigned long speedTimer;
 unsigned long turnTimer;
-unsigned long dmpTimer;
 unsigned long sr04Timer;
 double adjustAngle = 0.00;
 double zeroAngle = 0.00;
@@ -205,7 +204,6 @@ void notFound(AsyncWebServerRequest *request) {
 
 
 void setup() {
-  dmpTimer = millis();
   // join I2C bus (I2Cdev library doesn't do this automatically)
 #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
   Wire.begin(D3, D4);
