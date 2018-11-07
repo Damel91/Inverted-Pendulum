@@ -14,4 +14,10 @@ This version has OTA handler wich be managed during the stand-by, during that yo
 
 The stl files can be found here in case you want to print my design https://www.thingiverse.com/thing:3084400 or if you click on Inverted-Pendulum and you can download the entire project which also contain the stl files.
 
+External libraries you need to import before you can compile the sketch:
+
+ESPAsyncTCP  ---> https://github.com/me-no-dev/ESPAsyncTCP
+ESPAsyncWebServer ---> https://github.com/me-no-dev/ESPAsyncWebServer
+PID_v1 ---> https://github.com/br3ttb/Arduino-PID-Library/
+ArduinoJson ---> https://github.com/bblanchon/ArduinoJson (This is the 5.13stable version)
 
