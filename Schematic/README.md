@@ -5,3 +5,4 @@ Note that this is not the real positioning of the components, it just need to le
 
 If you are using a breadboard I personally suggest you to supply with 5V the ESP8266 first. I also have got a lot of issues by using  prototyping cables from the bread board to the hc-sr04, because when the servo is moving, the cables are stressed and they tend to break.   
 
+The motor driver used is the L298, but you can also use the L9110S(for the n20) but with the L298 you need to set the XL6009 output to 13,4V because of the protection diode. 
