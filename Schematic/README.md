@@ -7,7 +7,7 @@ If you are using a breadboard I personally suggest you to supply with 5V the ESP
 
 The motor driver used is the L298, but you can also use the L9110S(for the n20) but with the L298 you need to set the XL6009 output to 13,4V because of the protection diode. 
 
-You need to set the trimmer that is used for the battery status to 3.3V when the battery is 8.6V.
+You need to set the trimmer that is used for the battery status to 3.3V (for wemos d1 mini, 1V for the nodeMCU) when the battery is 8.6V.
 While the trimmer for the hc-sr04 must be set to 3.3V when the input is 5V. 
 
 Set the trimmers before to connect them to the ESP
